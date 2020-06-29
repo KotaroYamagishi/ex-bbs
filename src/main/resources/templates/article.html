@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 記事投稿フォーム -->
+    <h1>掲示板</h1>
+    <form th:action="@{/article/article-input}" method="post" th:object="${articleForm}">
+        <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></div>
+        投稿者：<input type="text" name="name" ><br>
+        <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" style="color:red"></div>
+        投稿内容:<br><textarea name="content"></textarea><br>
+        <button>記事投稿</button>
+    </form>
+    
+    
+    <!-- 記事投稿一覧 -->
+    
+    <div th:unless="${#lists.isEmpty(application.articleList)}">
+        <div th:each="article:${application.articleList}">
+            <hr>
+            
+            <!-- 記事投稿 -->
+            投稿者名：<span th:text="${article.name}"></span><br>
+            投稿内容：<br><br><span th:text="${article.content}"　style="font-weight: bold"></span>
+            <br><br>
+            <form th:action="@{/article/article-delete}">
+                <input type="hidden" name="articleId" th:value="${article.id}">
+                <button>記事削除</button>
+            </form><br>
+            
+            <!-- コメント投稿 -->
+            <div th:if="${article.commentList}">
+                <span th:each="comment:${article.commentList}">
+                    <span th:if="${comment.name}" th:text="'コメント者名：'"></span>
+                    <span th:text="${comment.name}"></span><br>
+                    <span th:if="${comment.content}" th:text="'コメント内容：'"></span>
+                    <br><span th:text="${comment.content}"></span><br><br>
+                </span>
+            </div>
+            
+            <!-- コメント入力フォーム -->
+            <form th:action="@{/article/article-comment}" method="post" th:object="${commentForm}">
+                <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" style="color:red"></div>
+                名前：<br>
+                <input type="text" name="name"><br>
+                <div th:if="${#fields.hasErrors('content')}" th:errors="*{content}" style="color:red"></div>
+                コメント：<br>
+                <input type="hidden" name="articleId" th:value="${article.id}">
+                <textarea name="content"></textarea><br>
+                <button>コメント投稿</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
